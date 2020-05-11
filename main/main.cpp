@@ -1,6 +1,5 @@
 #include <iostream>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include "histo.h"
 
 int main() {
     std::string name;
@@ -8,10 +7,6 @@ int main() {
     std::cin >> name;
 
     cv::Mat img = cv::imread(name);
-    //  cv::Mat dst;
-    // cv::Vec3b color; //wydobycie koloru z obrazu
-    // std::vector<int> Red, Green, Blue;
-
     std::vector<cv::Mat> BGR;
 
     if(!img.data){
@@ -19,49 +14,22 @@ int main() {
         return -1;
     }
 
-    cv::split(img, BGR);
+    cv::split(img, BGR); 
 
-    int histSize = 256; //number of bins
-    float range[] = {0, 256};
-    const float* histRange = {range}; //range of values (0..255)
+    histo Histogram(256, img.cols, img.rows, 0, 256);
+    Histogram.calculate(BGR);
+    Histogram.normalize();
+
+    cv::Mat histoImg = Histogram.drawHisto();
 
     bool uniform = true; bool accumulate = false;
 
     cv::Mat bHist, gHist, rHist;
 
-    cv::calcHist( &BGR[0], 1, 0, cv::Mat(), bHist, 1, &histSize, &histRange, uniform, accumulate);
-    cv::calcHist( &BGR[1], 1, 0, cv::Mat(), gHist, 1, &histSize, &histRange, uniform, accumulate);
-    cv::calcHist( &BGR[2], 1, 0, cv::Mat(), rHist, 1, &histSize, &histRange, uniform, accumulate);
-
-    int histWidth = 512;
-    int histHeight = 512;
-    int bin_w = cvRound((double ) histWidth / histSize);
-    cv::Mat histImage(histHeight, histWidth, CV_8UC3, cv::Scalar(0,0,0));
-
-    cv::normalize(bHist, bHist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(gHist, gHist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(rHist, rHist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-
-    for(int i = 1; i<histSize; ++i){
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(bHist.at<float>(i-1))),
-                cv::Point(bin_w*(i), histHeight - cvRound(bHist.at<float>(i))),
-                cv::Scalar(255, 0, 0), 2, 8, 0);
-
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(gHist.at<float>(i-1))),
-                 cv::Point(bin_w*(i), histHeight - cvRound(gHist.at<float>(i))),
-                 cv::Scalar(0, 255, 0), 2, 8, 0);
-
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(rHist.at<float>(i-1))),
-                 cv::Point(bin_w*(i), histHeight - cvRound(rHist.at<float>(i))),
-                 cv::Scalar(0, 0, 255), 2, 8, 0);
-    }
-
-
     //show the picture
 
     cv::namedWindow("Histogram", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Histogram", histImage);
+    cv::imshow("Histogram", histoImg);
 
     const std::string window_name = "OpenCV";
     cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
@@ -73,6 +41,10 @@ int main() {
 
 
 /*
+ *
+ *     //cv::Mat dst;
+    //cv::Vec3b color; //wydobycie koloru z obrazu
+    //std::vector<int> Red, Green, Blue;
  *     img.convertTo(dst, CV_8U); //CV_8U == unsigned 8bit/pixel
     float arrOut[dst.rows][dst.cols]; //2D array of
 
