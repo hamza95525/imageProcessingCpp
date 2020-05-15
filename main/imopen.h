@@ -7,6 +7,8 @@
 
 #include <math.h>
 #include <iostream>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
 #define PI 3.14159265
 
@@ -17,11 +19,14 @@ class imopen {
     int y2;
     int angle;
     int length;
-    std::vector<std::vector<int>> structuralElement;
+    std::vector<std::vector<bool>> structuralElement;
 
 public:
     imopen(int angle, int length);
     void bresenhamsLineAlgorithm();
+    void erosion(cv::Mat binImg);
+
+public:
     void showX2Y2(){
         std::cout<<x2<<std::endl<<y2<<std::endl;
     }
