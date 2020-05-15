@@ -8,7 +8,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-class histo {
+#define RED cv::Scalar(255, 0, 0)
+#define BLUE cv::Scalar(0, 0, 255)
+#define GREEN cv::Scalar(0, 255, 0)
+#define WHITE cv::Scalar(255, 255, 255)
+
+class histogram {
 private:
     int histSize;
     int histWidth;
@@ -23,9 +28,11 @@ private:
     cv::Mat histImage;
 
 public:
-    histo(int size, int width, int height, float rangeBegin, float rangeEnd);
+    histogram(int size, int width, int height, float rangeBegin, float rangeEnd);
     void calculate(std::vector<cv::Mat> &color);
     void normalize();
+    void show();
+
     cv::Mat drawHisto();
 };
 
