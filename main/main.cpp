@@ -37,13 +37,21 @@ int main() {
     Otwarcie.bresenhamsLineAlgorithm();
     // Otwarcie.showLine();
     cv::Mat erode = Otwarcie.erosion(img);
+    cv::Mat dilate = Otwarcie.dilate(img);
+    cv::Mat openned = Otwarcie.open(img);
 
 
     cv::namedWindow("wejsciowy", cv::WINDOW_AUTOSIZE);
     cv::imshow("wejsciowy", img);
 
+    cv::namedWindow("wyjsciowyErozja", cv::WINDOW_AUTOSIZE);
+    cv::imshow("wyjsciowyErozja", erode);
+
+    cv::namedWindow("wyjsciowyDylacja", cv::WINDOW_AUTOSIZE);
+    cv::imshow("wyjsciowyDylacja", dilate);
+
     cv::namedWindow("wyjsciowy", cv::WINDOW_AUTOSIZE);
-    cv::imshow("wyjsciowy", erode);
+    cv::imshow("wyjsciowy", openned);
 
     cv::waitKey(0);
     return 0;

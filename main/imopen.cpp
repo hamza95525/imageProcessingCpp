@@ -49,7 +49,7 @@ cv::Mat imopen::erosion(cv::Mat inImg) {
 
     cv::Vec3b color;
     int halfLength = (length-1)/2;
-    bool include = true;
+    bool fit = true;
 
     for(int i = halfLength; i<inImg.rows - halfLength; ++i){
         for(int j = halfLength; j<inImg.cols - halfLength; ++j){
@@ -58,15 +58,15 @@ cv::Mat imopen::erosion(cv::Mat inImg) {
                 for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
                     color = inImg.at<cv::Vec3b>(k, l);
                     if(color[0] == 0 && color[1] == 0 && color[2] == 0 && structuralElement[x][y] == 1){
-                        include = false;
+                        fit = false;
                         break;
                     }
                 }
-                if(!include)
+                if(!fit)
                     break;
             }
 
-            if(!include){
+            if(!fit){
                 for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
                     for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
                         if(structuralElement[x][y] == 1) {
@@ -78,9 +78,59 @@ cv::Mat imopen::erosion(cv::Mat inImg) {
                     }
                 }
             }
-            include = true;
+            fit = true;
         }
     }
+
+    return outImg;
+}
+
+cv::Mat imopen::dilate(cv::Mat inImg) {
+    std::vector<cv::Vec3b> neighbors;
+    cv::Mat outImg;
+    inImg.copyTo(outImg);
+
+    cv::Vec3b color;
+    int halfLength = (length-1)/2;
+    bool fit = true;
+
+    for(int i = halfLength; i<inImg.rows - halfLength; ++i){
+        for(int j = halfLength; j<inImg.cols - halfLength; ++j){
+
+            for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
+                for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
+                    color = inImg.at<cv::Vec3b>(k, l);
+                    if(color[0] != 0 && color[1] != 0 && color[2] != 0){ // && structuralElement[x][y] == 1){
+                        fit = false;
+                        break;
+                    }
+                }
+                if(!fit)
+                    break;
+            }
+
+            if(!fit){
+                for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
+                    for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
+                        if(structuralElement[x][y] == 1) {
+                            color[0] = 255;
+                            color[1] = 255;
+                            color[2] = 255;
+                            outImg.at<cv::Vec3b>(k, l) = color;
+                        }
+                    }
+                }
+            }
+            fit = true;
+        }
+    }
+
+    return outImg;
+}
+
+cv::Mat imopen::open(cv::Mat inImg) {
+    cv::Mat outImg = erosion(inImg);
+    outImg = dilate(outImg);
 
     return outImg;
 }

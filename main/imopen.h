@@ -26,7 +26,8 @@ public:
     imopen(int angle, int length);
     void bresenhamsLineAlgorithm();
     cv::Mat erosion(cv::Mat inImg);
-    cv::Mat dilate(cv::Mat binImg);
+    cv::Mat dilate(cv::Mat inImg);
+    cv::Mat open(cv::Mat inImg);
 
 public:
     void showX2Y2(){
