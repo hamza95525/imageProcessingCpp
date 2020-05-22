@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
@@ -24,7 +25,8 @@ class imopen {
 public:
     imopen(int angle, int length);
     void bresenhamsLineAlgorithm();
-    void erosion(cv::Mat binImg);
+    cv::Mat erosion(cv::Mat inImg);
+    cv::Mat dilate(cv::Mat binImg);
 
 public:
     void showX2Y2(){

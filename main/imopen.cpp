@@ -4,10 +4,12 @@
 
 #include "imopen.h"
 
+#include <utility>
+
 imopen::imopen(int angle, int length) :
     x1(0), y1(0), angle(angle),length(length)
 {
-    x2 = round (x1 + cos(angle*PI / 180.0 ) * length );
+    x2 = round ( x1 + cos(angle*PI / 180.0 ) * length );
     y2 = round ( y1 + sin( angle*PI/180.0 ) * length );
 
     for(int x = x1; x <= x2; ++x){
@@ -40,22 +42,45 @@ void imopen::bresenhamsLineAlgorithm() {
     }
 }
 
-void imopen::erosion(cv::Mat binImg) {
-    std::vector<std::vector<bool> > neighbors;
+cv::Mat imopen::erosion(cv::Mat inImg) {
+    std::vector<cv::Vec3b> neighbors;
+    cv::Mat outImg;
+    inImg.copyTo(outImg);
 
-    for(int i = 0; i<binImg.rows; ++i){
-        for(int j = 0; j<binImg.cols; ++j){
-            std::cout<< binImg.at<bool>(i, j) << " ";
+    cv::Vec3b color;
+    int halfLength = (length-1)/2;
+    bool include = true;
 
-            if(binImg.at<bool>(i, j)){
-                for(auto & k : structuralElement){
-                    std::vector<bool> temp;
-                    for(int l = 0; l<k.size(); ++l){
-                        //todo;
+    for(int i = halfLength; i<inImg.rows - halfLength; ++i){
+        for(int j = halfLength; j<inImg.cols - halfLength; ++j){
+
+            for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
+                for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
+                    color = inImg.at<cv::Vec3b>(k, l);
+                    if(color[0] == 0 && color[1] == 0 && color[2] == 0 && structuralElement[x][y] == 1){
+                        include = false;
+                        break;
+                    }
+                }
+                if(!include)
+                    break;
+            }
+
+            if(!include){
+                for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
+                    for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
+                        if(structuralElement[x][y] == 1) {
+                            color[0] = 0;
+                            color[1] = 0;
+                            color[2] = 0;
+                            outImg.at<cv::Vec3b>(k, l) = color;
+                        }
                     }
                 }
             }
+            include = true;
         }
-        std::cout << std::endl;
     }
+
+    return outImg;
 }

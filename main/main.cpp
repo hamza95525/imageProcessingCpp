@@ -35,12 +35,15 @@ int main() {
 
     imopen Otwarcie(angle, length);
     Otwarcie.bresenhamsLineAlgorithm();
-    Otwarcie.showLine();
-  //  Otwarcie.erosion(img);
+    // Otwarcie.showLine();
+    cv::Mat erode = Otwarcie.erosion(img);
 
 
     cv::namedWindow("wejsciowy", cv::WINDOW_AUTOSIZE);
     cv::imshow("wejsciowy", img);
+
+    cv::namedWindow("wyjsciowy", cv::WINDOW_AUTOSIZE);
+    cv::imshow("wyjsciowy", erode);
 
     cv::waitKey(0);
     return 0;
