@@ -2,7 +2,7 @@
 // Created by khamzat on 5/11/20.
 //
 
-#include "histo.h"
+#include "../headers/histo.h"
 
 histogram::histogram(int size, int width, int height, float rangeBegin, float rangeEnd) : histSize(size), histWidth(width), histHeight(height){
     //constructor

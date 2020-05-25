@@ -1,6 +1,6 @@
 #include <iostream>
-#include "histo.h"
-#include "imopen.h"
+#include "headers/histo.h"
+#include "headers/imopen.h"
 
 int main() {
     std::string name;
@@ -13,21 +13,8 @@ int main() {
         return -1;
     }
 
-    //=================HISTOGRAM===================
-  /*
-    std::vector<cv::Mat> BGR;
-    cv::Vec3b color; //wydobycie koloru z obrazu
-    std::vector<float> Red, Green, Blue;
-    cv::split(img, BGR);
-    histogram Histogram(256, 512, 256, 0, 256); //size, width, height, range = [0,256]
-    Histogram.calculate(BGR);
-    Histogram.normalize();
-    Histogram.drawHisto();
-    Histogram.show();*/
-    //=============================================
-
-    int length;
-    int angle;
+    double length;
+    double angle;
     std::cout << "Prosze wprowadzic dlugosc: ";
     std::cin >> length;
     std::cout << "Prosze wprowadzic nachylenie: ";
@@ -35,23 +22,16 @@ int main() {
 
     imopen Otwarcie(angle, length);
     Otwarcie.bresenhamsLineAlgorithm();
-    // Otwarcie.showLine();
-    cv::Mat erode = Otwarcie.erosion(img);
-    cv::Mat dilate = Otwarcie.dilate(img);
-    cv::Mat openned = Otwarcie.open(img);
-
+    Otwarcie.showLine();
+    cv::Mat openned = Otwarcie.openMono(img);
+   // cv::Mat erosion = Otwarcie.erosionMono(img);
+   // cv::Mat dilate = Otwarcie.dilateMono(img);
 
     cv::namedWindow("wejsciowy", cv::WINDOW_AUTOSIZE);
     cv::imshow("wejsciowy", img);
 
-    cv::namedWindow("wyjsciowyErozja", cv::WINDOW_AUTOSIZE);
-    cv::imshow("wyjsciowyErozja", erode);
-
-    cv::namedWindow("wyjsciowyDylacja", cv::WINDOW_AUTOSIZE);
-    cv::imshow("wyjsciowyDylacja", dilate);
-
-    cv::namedWindow("wyjsciowy", cv::WINDOW_AUTOSIZE);
-    cv::imshow("wyjsciowy", openned);
+    cv::namedWindow("otwarty", cv::WINDOW_AUTOSIZE);
+    cv::imshow("otwarty", openned);
 
     cv::waitKey(0);
     return 0;

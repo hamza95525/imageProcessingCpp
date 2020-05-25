@@ -13,21 +13,28 @@
 #include <vector>
 #define PI 3.14159265
 
-class imopen {
+class imopen{
     int x1;
     int x2;
     int y1;
     int y2;
-    int angle;
+    double angle;
     int length;
     std::vector<std::vector<bool>> structuralElement;
 
 public:
-    imopen(int angle, int length);
+    imopen(double angle, double length);
     void bresenhamsLineAlgorithm();
-    cv::Mat erosion(cv::Mat inImg);
-    cv::Mat dilate(cv::Mat inImg);
-    cv::Mat open(cv::Mat inImg);
+    std::vector<int> minCoords(std::vector<std::vector<double>> &grayArr);
+    std::vector<int> maxCoords(std::vector<std::vector<double>> &grayArr);
+
+    cv::Mat erosionBin(cv::Mat inImg);
+    cv::Mat dilateBin(cv::Mat inImg);
+    cv::Mat openBin(cv::Mat inImg);
+
+    cv::Mat erosionMono(cv::Mat inImg);
+    cv::Mat dilateMono(cv::Mat inImg);
+    cv::Mat openMono(cv::Mat inImg);
 
 public:
     void showX2Y2(){
