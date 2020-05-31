@@ -6,67 +6,42 @@
 
 #include <utility>
 
-imopen::imopen(double angle, double length) :
-    x1(0), y1(0), angle(angle),length(length)
+imopen::imopen(cv::Mat inImg, double angle, int length, const strel& SE, const std::string& type)
 {
-    x2 = round( x1 + cos(angle*PI / 180.0 ) * length );
-    y2 = round( y1 + sin( angle*PI/180.0 ) * length );
-
-    std::cout << "( " << x1 << ", " << y1 << " )" << " - ( " << x2 << ", " << y2 << " )\n";
-    for(int x = x1; x <= x2; ++x){
-        std::vector<bool> temp;
-        for(int y = y1; y <= y2; ++y){
-            temp.push_back(false);
-        }
-        structuralElement.push_back(temp);
+    if(type == "bin"){
+        //todo
+        outImg = erosionBin(std::move(inImg), SE);
+        outImg = dilateBin(outImg, SE);
+    } else if(type == "mono"){
+        //todo
+        outImg = erosionMono(std::move(inImg), SE);
+        outImg = dilateMono(outImg, SE);
+    } else {
+        std::cout << "Nalezy wprowadzic typ jako 'mono' lub 'bin'!\n ";
     }
 }
 
-void imopen::bresenhamsLineAlgorithm() {
-    int d, dx, dy, ai, bi, xi, yi;
-    int x = x1, y = y1;
+imopen::imopen(cv::Mat inImg) : outImg(std::move(inImg)){
+}
 
-    dx = (x1 < x2) ? (x2 - x1) : (x1 - x2);
-    xi = (x1 < x2) ? 1 : -1;
+cv::Mat imopen::binarization(cv::Mat inImg) {
+    cv::Mat localOutImg;
+    inImg.copyTo(localOutImg);
+    cv::Vec3b color;
 
-    dy = (y1 < y2) ? (y2 - y1) : (y1 - y2);
-    yi = (y1 < y2) ? 1 : -1;
-
-    structuralElement[x][y] = true;
-
-    if(dx > dy){
-        ai = (dy - dx) * 2;
-        bi = dy * 2;
-        d = bi - dx;
-
-        while(x != x2){
-            if(d>=0){
-                x += xi;
-                y += yi;
-                d += ai;
-            } else {
-                d += bi;
-                x += xi;
+    for(int i = 0; i<inImg.rows; ++i){
+        for(int j = 0; j<inImg.cols; ++j){
+            color = inImg.at<cv::Vec3b>(i, j);
+            for(int x = 0; x<3; x++){
+                color[x] = (color[x] >= 127) ? 255 : 0;
             }
-            structuralElement[x][y] = true;
-        }
-    } else {
-        ai = (dx - dy) * 2;
-        bi = dx * 2;
-        d = bi - dy;
 
-        while(y != y2){
-            if(d>=0){
-                x += xi;
-                y += yi;
-                d += ai;
-            } else {
-                d += bi;
-                y += yi;
-            }
-            structuralElement[x][y] = true;
+            localOutImg.at<cv::Vec3b>(i, j) = color;
         }
+
     }
+
+    return localOutImg;
 }
 
 std::vector<int> imopen::minCoords(std::vector<std::vector<double> > &grayArr) {
@@ -111,20 +86,20 @@ std::vector<int> imopen::maxCoords(std::vector<std::vector<double> > &grayArr) {
     return coordinates;
 }
 
-cv::Mat imopen::erosionBin(cv::Mat inImg) {
+cv::Mat imopen::erosionBin(const cv::Mat& inImg, const strel& SE) {
     cv::Mat outImg;
-    inImg.copyTo(outImg);
+    outImg = binarization(inImg);
 
     cv::Vec3b color;
-    int halfLength = (length-1)/2;
+    int halfLength = (SE.length-1)/2;
 
     for(int i = halfLength; i<inImg.rows - halfLength; ++i){
         for(int j = halfLength; j<inImg.cols - halfLength; ++j){
-
+            std::cout<<outImg.at<cv::Vec3b>(i, j)<<" ";
             for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
                 for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
-                    color = inImg.at<cv::Vec3b>(k, l);
-                    if(color[0] == 0 && color[1] == 0 && color[2] == 0 && structuralElement[x][y] == 1){
+                    color = outImg.at<cv::Vec3b>(k, l);
+                    if(color[0] == 0 && color[1] == 0 && color[2] == 0 && SE.structuralElement[x][y] == 1){
 
                         for(int m = i - halfLength; m<=i+halfLength; m++){
                             for(int n = j - halfLength; n <= j+halfLength; n++){
@@ -137,25 +112,26 @@ cv::Mat imopen::erosionBin(cv::Mat inImg) {
             }
 
         }
+        std::cout<<"\n";
     }
 
     return outImg;
 }
 
-cv::Mat imopen::dilateBin(cv::Mat inImg) {
+cv::Mat imopen::dilateBin(const cv::Mat& inImg, const strel& SE) {
     cv::Mat outImg;
-    inImg.copyTo(outImg);
+    outImg = binarization(inImg);
 
     cv::Vec3b color;
-    int halfLength = (length-1)/2;
+    int halfLength = (SE.length-1)/2;
 
     for(int i = halfLength; i<inImg.rows - halfLength; ++i){
         for(int j = halfLength; j<inImg.cols - halfLength; ++j){
 
             for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
                 for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
-                    color = inImg.at<cv::Vec3b>(k, l);
-                    if(color[0] != 0 && color[1] != 0 && color[2] != 0){
+                    color = outImg.at<cv::Vec3b>(k, l);
+                    if(color[0] == 255 && color[1] == 255 && color[2] == 255){
 
                         for(int m = i - halfLength; m<=i+halfLength; m++){
                             for(int n = j - halfLength; n <= j+halfLength; n++){
@@ -173,21 +149,14 @@ cv::Mat imopen::dilateBin(cv::Mat inImg) {
     return outImg;
 }
 
-cv::Mat imopen::openBin(cv::Mat inImg) {
-    cv::Mat outImg = erosionBin(std::move(inImg));
-    outImg = dilateBin(outImg);
-
-    return outImg;
-}
-
-cv::Mat imopen::erosionMono(cv::Mat inImg) {
+cv::Mat imopen::erosionMono(cv::Mat inImg, const strel& SE) {
     cv::Mat outImg;
     inImg.copyTo(outImg);
 
     cv::Vec3b color;
     double gray = 0;
 
-    int halfLength = (length-1)/2;
+    int halfLength = (SE.length-1)/2;
 
 
     for(int i = halfLength; i<inImg.rows - halfLength; ++i){
@@ -212,7 +181,7 @@ cv::Mat imopen::erosionMono(cv::Mat inImg) {
 
             for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
                 for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
-                    if(structuralElement[x][y] == 1)
+                    if(SE.structuralElement[x][y] == 1)
                         outImg.at<cv::Vec3b>(k, l) = neighborsBGR[coords[0]][coords[1]];
                 }
             }
@@ -222,14 +191,14 @@ cv::Mat imopen::erosionMono(cv::Mat inImg) {
     return outImg;
 }
 
-cv::Mat imopen::dilateMono(cv::Mat inImg) {
+cv::Mat imopen::dilateMono(cv::Mat inImg, const strel& SE) {
     cv::Mat outImg;
     inImg.copyTo(outImg);
 
     cv::Vec3b color;
     double gray = 0;
 
-    int halfLength = (length-1)/2;
+    int halfLength = (SE.length-1)/2;
 
 
     for(int i = halfLength; i<inImg.rows - halfLength; ++i){
@@ -254,19 +223,12 @@ cv::Mat imopen::dilateMono(cv::Mat inImg) {
 
             for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
                 for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
-                    if(structuralElement[x][y] == 1)
+                    if(SE.structuralElement[x][y] == 1)
                         outImg.at<cv::Vec3b>(k, l) = neighborsBGR[coords[0]][coords[1]];
                 }
             }
         }
     }
-
-    return outImg;
-}
-
-cv::Mat imopen::openMono(cv::Mat inImg) {
-    cv::Mat outImg = erosionMono(std::move(inImg));
-    outImg = dilateMono(outImg);
 
     return outImg;
 }
