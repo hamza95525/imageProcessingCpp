@@ -4,46 +4,51 @@
 
 #include "../headers/histo.h"
 
-histogram::histogram(int size, int width, int height, float rangeBegin, float rangeEnd) : histSize(size), histWidth(width), histHeight(height){
-    //constructor
-    range[0] = rangeBegin; range[1] = rangeEnd;
-    bin_w = cvRound((double ) histWidth/histSize);
-
-    cv::Mat histIm(histHeight, histWidth, CV_8UC3, WHITE);
-    histImage = histIm;
+histogram::histogram(cv::Mat inImg, double mean, double stdDev) : nWidth(inImg.cols), mean(mean), stdDev(stdDev) {
+    //todo
+    gauss.resize(nWidth);
 }
 
-void histogram::calculate(std::vector<cv::Mat> &color) {
-    cv::calcHist( &color[0], 1, 0, cv::Mat(), bHist, 1, &histSize, &histRange, uniform, accumulate); //blue
-    cv::calcHist( &color[1], 1, 0, cv::Mat(), gHist, 1, &histSize, &histRange, uniform, accumulate); //green
-    cv::calcHist( &color[2], 1, 0, cv::Mat(), rHist, 1, &histSize, &histRange, uniform, accumulate); //red
-}
+void histogram::rgb2gray(const cv::Mat& inImg) {
+    cv::Vec3b color;
 
-void histogram::normalize() {
-    cv::normalize(bHist, bHist, 0, ( histImage.rows - 10 ), cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(gHist, gHist, 0, ( histImage.rows - 10 ), cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(rHist, rHist, 0, ( histImage.rows -  10 ), cv::NORM_MINMAX, -1, cv::Mat());
-}
-
-cv::Mat histogram::drawHisto() {
-    for(int i = 1; i<histSize; ++i){
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(bHist.at<float>(i-1))),
-                 cv::Point(bin_w*(i), histHeight - cvRound(bHist.at<float>(i))),
-                 BLUE, 1, 8, 0);
-
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(gHist.at<float>(i-1))),
-                 cv::Point(bin_w*(i), histHeight - cvRound(gHist.at<float>(i))),
-                 GREEN, 1, 8, 0);
-
-        cv::line(histImage, cv::Point(bin_w * (i-1), histHeight - cvRound(rHist.at<float>(i-1))),
-                 cv::Point(bin_w*(i), histHeight - cvRound(rHist.at<float>(i))),
-                 RED, 1, 8, 0);
+    for(int i = 0; i<inImg.rows; i++){
+        std::vector<int> temp;
+        for(int j = 0; j<inImg.cols; j++){
+            color = inImg.at<cv::Vec3b>(i, j);
+            temp.push_back(color[0]*0.114 + color[1]*0.587 + color[2]*0.299);
+        }
+        gray.push_back(temp);
     }
 
-    return histImage;
+    std::vector<int> arr(256);
+    for(int i = 0; i<inImg.rows; i++){
+        for(int j = 0; j<inImg.cols; j++){
+            arr[gray[i][j]]++;
+            std::cout<<gray[i][j] << " ";
+        }
+        std::cout<<std::endl;
+    }
+
+    histo = arr;
+
+    for(int i = 0; i<256; i++)
+        std::cout<<"hist["<<i<<"] = "<< histo[i]<< "\n";
 }
 
-void histogram::show() {
-    cv::namedWindow("Histogram", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Histogram", histImage);
+void histogram::randomNumberDistribution() {
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+
+    std::normal_distribution<double> distrN(mean, stdDev);
+
+    for(int i=0; i<800; i++){
+        int num = distrN(e);
+        if(num >= 0 && num < nWidth)
+            gauss[num]++;
+    }
+
+    for(int i = 0; i<nWidth; i++)
+        std::cout << ": " << std::string(gauss[i], '*') << std::endl;
+
 }

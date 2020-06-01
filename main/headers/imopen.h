@@ -21,18 +21,18 @@ public:
     imopen(cv::Mat inImg, double angle, int length, const strel& SE, const std::string& type);
     imopen(cv::Mat inImg);
 
-    cv::Mat erosionBin(const cv::Mat& inImg, const strel& SE);
-    cv::Mat dilateBin(const cv::Mat& inImg, const strel& SE);
-
-    cv::Mat erosionMono(cv::Mat inImg, const strel& SE);
-    cv::Mat dilateMono(cv::Mat inImg, const strel& SE);
-
     cv::Mat returnOut(){
         return outImg;
     }
 
 private:
-    cv::Mat binarization(cv::Mat inImg);
+    static cv::Mat erosionBin(const cv::Mat& inImg, const strel& SE);
+    static cv::Mat dilateBin(const cv::Mat& inImg, const strel& SE);
+
+    static cv::Mat erosionMono(cv::Mat inImg, const strel& SE);
+    static cv::Mat dilateMono(cv::Mat inImg, const strel& SE);
+
+    static cv::Mat binarization(cv::Mat inImg);
     static std::vector<int> minCoords(std::vector<std::vector<double>> &grayArr);
     static std::vector<int> maxCoords(std::vector<std::vector<double>> &grayArr);
 };

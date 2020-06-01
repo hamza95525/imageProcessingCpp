@@ -5,6 +5,8 @@
 #ifndef MAIN_HISTO_H
 #define MAIN_HISTO_H
 
+#include <iostream>
+#include <random>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -14,26 +16,22 @@
 #define WHITE cv::Scalar(255, 255, 255)
 
 class histogram {
-private:
-    int histSize;
-    int histWidth;
-    int histHeight;
-    int bin_w;
-    float range[2];
-    const float* histRange = {range}; //range of values (0..255)
-    bool uniform = true;
-    bool accumulate = false;
+    std::vector<std::vector<int>> gray;
 
-    cv::Mat bHist, gHist, rHist;
-    cv::Mat histImage;
+    std::vector<std::vector<int>> blue;
+    std::vector<std::vector<int>> green;
+    std::vector<std::vector<int>> red;
+
+    std::vector<int> histo;
+    int nWidth;
+    double mean;
+    double stdDev;
+    std::vector<int> gauss;
 
 public:
-    histogram(int size, int width, int height, float rangeBegin, float rangeEnd);
-    void calculate(std::vector<cv::Mat> &color);
-    void normalize();
-    void show();
-
-    cv::Mat drawHisto();
+    histogram(cv::Mat inImg, double mean, double stdDev);
+    void rgb2gray(const cv::Mat& inImg);
+    void randomNumberDistribution();
 };
 
 

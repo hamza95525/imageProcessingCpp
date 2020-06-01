@@ -21,18 +21,7 @@ class hitmiss {
 
 public:
     hitmiss(cv::Mat inImg, const std::vector<std::vector<int>> &SE1, const std::vector<std::vector<int>> &SE2);
-
-    cv::Mat customSum(const cv::Mat& imgOne, const cv::Mat& imgTwo);
-    cv::Mat customOr(const cv::Mat& imgOne, const cv::Mat& imgTwo);
-    static bool isEqual(const cv::Mat &imgOne, const cv::Mat &imgTwo);
-    static void rotate(std::vector<std::vector<int>> &SE);
-    cv::Mat hitOrMiss(const cv::Mat& inImg, const std::vector<std::vector<int>>& SE );
     cv::Mat convexHull(const cv::Mat& inImg);
-
-    cv::Mat erosion(const cv::Mat& inImg, std::vector<std::vector<int>> SE);
-
-    cv::Mat imComplement(const cv::Mat& inImg);
-    cv::Mat binarization(cv::Mat inImg);
 
     void showSE(std::vector<std::vector<int>> SE){
         for(int i = 0; i<SE.size(); i++){
@@ -42,6 +31,16 @@ public:
             std::cout<<"\n";
         }
     }
+
+//private:
+    static cv::Mat hitOrMiss(const cv::Mat& inImg, const std::vector<std::vector<int>>& SE );
+    static cv::Mat imComplement(const cv::Mat& inImg);
+    static cv::Mat binarization(cv::Mat inImg);
+    static bool isEqual(const cv::Mat &imgOne, const cv::Mat &imgTwo);
+    static void rotate(std::vector<std::vector<int>> &SE);
+
+    static cv::Mat customSum(const cv::Mat& imgOne, const cv::Mat& imgTwo);
+    static cv::Mat customOr(const cv::Mat& imgOne, const cv::Mat& imgTwo);
 };
 
 #endif //MAIN_HITMISS_H
