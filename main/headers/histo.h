@@ -16,22 +16,30 @@
 #define WHITE cv::Scalar(255, 255, 255)
 
 class histogram {
-    std::vector<std::vector<int>> gray;
+    cv::Mat inImg;
 
+    int nWidth;
+    int nKlass;
+    double mean;
+    double stdDev;
+
+    std::vector<std::vector<int>> gray;
     std::vector<std::vector<int>> blue;
     std::vector<std::vector<int>> green;
     std::vector<std::vector<int>> red;
 
     std::vector<int> histo;
-    int nWidth;
-    double mean;
-    double stdDev;
-    std::vector<int> gauss;
+    std::vector<int> dyst;
+    std::vector<int> LUT;
 
 public:
-    histogram(cv::Mat inImg, double mean, double stdDev);
+    histogram(const cv::Mat& inImg, double mean, double stdDev, int nKlass);
+
     void rgb2gray(const cv::Mat& inImg);
     void randomNumberDistribution();
+    void createLUT();
+
+    cv::Mat equalizeMono();
 };
 
 

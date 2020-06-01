@@ -16,10 +16,22 @@ int main() {
         return -1;
     }
 
-    histogram Histogram(img, 10.0, 2.0);
+    double mean = 0;
+    double stdDev = 0;
+    std::cout<<"Prosze wprowadzic srednia i odchylenie standardowe do rozkladu gaussa: ";
+    std::cin>>mean;
+    std::cin>>stdDev;
+
+    histogram Histogram(img, mean, stdDev, 4);
     Histogram.rgb2gray(img);
     Histogram.randomNumberDistribution();
+    Histogram.createLUT();
+    cv::Mat out = Histogram.equalizeMono();
 
+    cv::namedWindow("in", cv::WINDOW_AUTOSIZE);
+    cv::imshow("in", img);
+    cv::namedWindow("out", cv::WINDOW_AUTOSIZE);
+    cv::imshow("out", out);
 
     cv::waitKey(0);
     return 0;
