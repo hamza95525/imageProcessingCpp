@@ -20,7 +20,6 @@ class histogram {
 
     int nWidth;
     int nKlass;
-    double mean;
     double stdDev;
 
     std::vector<std::vector<int>> gray;
@@ -29,11 +28,11 @@ class histogram {
     std::vector<std::vector<int>> red;
 
     std::vector<int> histo;
-    std::vector<int> dyst;
+    std::vector<double> dyst;
     std::vector<int> LUT;
 
 public:
-    histogram(const cv::Mat& inImg, double mean, double stdDev, int nKlass);
+    histogram(const cv::Mat& inImg, double stdDev, int nKlass);
 
     void rgb2gray(const cv::Mat& inImg);
     void randomNumberDistribution();

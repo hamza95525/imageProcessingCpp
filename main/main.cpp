@@ -16,13 +16,14 @@ int main() {
         return -1;
     }
 
-    double mean = 0;
+    int n_Klass = 0;
     double stdDev = 0;
-    std::cout<<"Prosze wprowadzic srednia i odchylenie standardowe do rozkladu gaussa: ";
-    std::cin>>mean;
-    std::cin>>stdDev;
 
-    histogram Histogram(img, mean, stdDev, 4);
+    std::cout<<"Prosze wprowadzic odchylenie standardowe do rozkladu gaussa oraz ilosc klas: ";
+    std::cin>>stdDev;
+    std::cin>>n_Klass;
+
+    histogram Histogram(img, stdDev, n_Klass);
     Histogram.rgb2gray(img);
     Histogram.randomNumberDistribution();
     Histogram.createLUT();

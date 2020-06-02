@@ -4,10 +4,9 @@
 
 #include "../headers/histo.h"
 
-histogram::histogram(const cv::Mat& inImg, double mean, double stdDev, int nKlass)
-    : inImg(inImg), nWidth(inImg.cols), mean(mean), stdDev(stdDev), nKlass(nKlass) {
+histogram::histogram(const cv::Mat& inImg, double stdDev, int nKlass)
+    : inImg(inImg), nWidth(inImg.cols), stdDev(stdDev), nKlass(nKlass) {
     //todo
-    dyst.resize(256);
 }
 
 void histogram::rgb2gray(const cv::Mat& inImg) {
@@ -34,34 +33,29 @@ void histogram::rgb2gray(const cv::Mat& inImg) {
 }
 
 void histogram::randomNumberDistribution() {
-    std::default_random_engine e;
+    int N = 255;
 
-    std::normal_distribution<double> distrN(mean, stdDev);
+    for (int i = 0; i < N; i++)
+        dyst.push_back(exp(-1 * pow((double)i - 127, 2) / (2. * pow(stdDev, 2))) / (stdDev * sqrt(2. * 3.1415)) );
 
-    for(int i=0; i<2*inImg.cols*inImg.rows; i++){
-        int num = distrN(e);
-        if(num >= 0 && num < 256)
-            dyst[num]++;
-    }
+    for (int i = 1; i < N; i++)
+        dyst[i] += (dyst[i - 1] >= 1) ? 1 : dyst[i - 1];
 
 }
 
 void histogram::createLUT() {
     int n = 0;
 
-    for(int i = 0; i<256; i++){
-        std::cout<<dyst[i] << "---" <<( (n+1)*inImg.rows*inImg.cols / (double)nKlass )<<"\n";
 
-        if( dyst[i] >= (n+1)*inImg.rows*inImg.cols / (double)nKlass ){
+    for(int i = 0; i<256; i++){
+
+        if( dyst[i] >= (n+1) / (double)nKlass ){
             n++;
             if( n >= nKlass )
                 n = nKlass - 1;
         }
         LUT.push_back( (int)((double)((256-1)*n)/(double)(nKlass-1)) );
     }
-
-    for(int i = 0; i<256; i++)
-        std::cout<<"LUT[" << i << "]" << LUT[i]<<std::endl;
 }
 
 cv::Mat histogram::equalizeMono() {
