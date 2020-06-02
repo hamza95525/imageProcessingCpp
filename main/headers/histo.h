@@ -23,22 +23,30 @@ class histogram {
     double stdDev;
 
     std::vector<std::vector<int>> gray;
+    std::vector<int> histoGray;
+
     std::vector<std::vector<int>> blue;
     std::vector<std::vector<int>> green;
     std::vector<std::vector<int>> red;
 
-    std::vector<int> histo;
+    std::vector<int> histoBlue;
+    std::vector<int> histoGreen;
+    std::vector<int> histoRed;
+
+
     std::vector<double> dyst;
     std::vector<int> LUT;
 
 public:
     histogram(const cv::Mat& inImg, double stdDev, int nKlass);
 
-    void rgb2gray(const cv::Mat& inImg);
+    void takeRGB();
+    void rgb2gray();
     void randomNumberDistribution();
     void createLUT();
 
     cv::Mat equalizeMono();
+    cv::Mat equalizeRGB();
 };
 
 

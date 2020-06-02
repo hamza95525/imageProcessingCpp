@@ -24,10 +24,11 @@ int main() {
     std::cin>>n_Klass;
 
     histogram Histogram(img, stdDev, n_Klass);
-    Histogram.rgb2gray(img);
+    Histogram.takeRGB();
+    Histogram.rgb2gray();
     Histogram.randomNumberDistribution();
     Histogram.createLUT();
-    cv::Mat out = Histogram.equalizeMono();
+    cv::Mat out = Histogram.equalizeRGB();
 
     cv::namedWindow("in", cv::WINDOW_AUTOSIZE);
     cv::imshow("in", img);
