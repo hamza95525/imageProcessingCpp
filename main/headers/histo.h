@@ -10,24 +10,24 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#define RED cv::Scalar(255, 0, 0)
-#define BLUE cv::Scalar(0, 0, 255)
-#define GREEN cv::Scalar(0, 255, 0)
-#define WHITE cv::Scalar(255, 255, 255)
+#define PI 3.14159265359
+
 
 class histogram {
     cv::Mat inImg;
+    cv::Mat outImg;
 
     int nWidth;
     int nKlass;
     double stdDev;
+    std::string type;
 
-    std::vector<std::vector<int>> gray;
+    std::vector<std::vector<double>> gray;
     std::vector<int> histoGray;
 
-    std::vector<std::vector<int>> blue;
-    std::vector<std::vector<int>> green;
-    std::vector<std::vector<int>> red;
+    std::vector<std::vector<double>> blue;
+    std::vector<std::vector<double>> green;
+    std::vector<std::vector<double>> red;
 
     std::vector<int> histoBlue;
     std::vector<int> histoGreen;
@@ -35,11 +35,16 @@ class histogram {
 
 
     std::vector<double> dyst;
-    std::vector<int> LUT;
+    std::vector<double> LUT;
 
 public:
-    histogram(const cv::Mat& inImg, double stdDev, int nKlass);
+    histogram(const cv::Mat& inImg, double stdDev, int nKlass, std::string type);
 
+    cv::Mat returnOut(){
+        return outImg;
+    };
+
+private:
     void takeRGB();
     void rgb2gray();
     void randomNumberDistribution();

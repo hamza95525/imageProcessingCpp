@@ -18,17 +18,15 @@ int main() {
 
     int n_Klass = 0;
     double stdDev = 0;
+    std::string type;
 
-    std::cout<<"Prosze wprowadzic odchylenie standardowe do rozkladu gaussa oraz ilosc klas: ";
+    std::cout<<"Prosze wprowadzic typ obrazu(RGB/Mono), odchylenie standardowe do rozkladu gaussa oraz ilosc klas: ";
+    std::cin>>type;
     std::cin>>stdDev;
     std::cin>>n_Klass;
 
-    histogram Histogram(img, stdDev, n_Klass);
-    Histogram.takeRGB();
-    Histogram.rgb2gray();
-    Histogram.randomNumberDistribution();
-    Histogram.createLUT();
-    cv::Mat out = Histogram.equalizeRGB();
+    histogram Histogram(img, stdDev, n_Klass, type);
+    cv::Mat out = Histogram.returnOut();
 
     cv::namedWindow("in", cv::WINDOW_AUTOSIZE);
     cv::imshow("in", img);
