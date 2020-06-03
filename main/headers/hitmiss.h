@@ -21,7 +21,6 @@ class hitmiss {
 
 public:
     hitmiss(cv::Mat inImg, const std::vector<std::vector<int>> &SE1, const std::vector<std::vector<int>> &SE2);
-    cv::Mat convexHull(const cv::Mat& inImg);
 
     void showSE(std::vector<std::vector<int>> SE){
         for(int i = 0; i<SE.size(); i++){
@@ -32,7 +31,13 @@ public:
         }
     }
 
-//private:
+    cv::Mat returnOut(){
+        return outImg;
+    }
+
+private:
+    cv::Mat thickening(const cv::Mat& inImg);
+
     static cv::Mat hitOrMiss(const cv::Mat& inImg, const std::vector<std::vector<int>>& SE );
     static cv::Mat imComplement(const cv::Mat& inImg);
     static cv::Mat binarization(cv::Mat inImg);

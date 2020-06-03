@@ -33,7 +33,6 @@ class histogram {
     std::vector<int> histoGreen;
     std::vector<int> histoRed;
 
-
     std::vector<double> dyst;
     std::vector<double> LUT;
 

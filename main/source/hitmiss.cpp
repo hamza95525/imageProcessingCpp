@@ -3,7 +3,8 @@
 //
 #include "../headers/hitmiss.h"
 
-hitmiss::hitmiss(cv::Mat inImg, const std::vector<std::vector<int>> &SE1, const std::vector<std::vector<int>> &SE2) : outImg(std::move(inImg)), SE1(SE1), SE2(SE2) {
+hitmiss::hitmiss(cv::Mat inImg, const std::vector<std::vector<int>> &SE1, const std::vector<std::vector<int>> &SE2) : SE1(SE1), SE2(SE2) {
+    outImg = thickening(inImg);
 }
 
 cv::Mat hitmiss::binarization(cv::Mat inImg) {
@@ -122,7 +123,10 @@ bool hitmiss::isEqual(const cv::Mat &imgOne, const cv::Mat &imgTwo) {
 
     for(int i = 0; i<colorsOne.size(); i++){
         for(int j = 0; j<colorsOne[i].size(); j++){
-            if(colorsOne[i][j] != colorsTwo[i][j])
+            cv::Vec3b tempOne = colorsOne[i][j];
+            cv::Vec3b tempTwo = colorsTwo[i][j];
+
+            if(tempOne[0] != tempTwo[0] && tempOne[1] != tempTwo[1] && tempOne[2] != tempTwo[2])
                 return false;
         }
     }
@@ -138,44 +142,42 @@ cv::Mat hitmiss::hitOrMiss(const cv::Mat& inImg, const std::vector<std::vector<i
     localOutImg.copyTo(outcopy);
 
     cv::Vec3b color;
-    int halfLength = (3-1)/2;
     bool cover;
 
-    for(int i = halfLength; i<inImg.rows - halfLength; ++i){
-        for(int j = halfLength; j<inImg.cols - halfLength; ++j){
+    for(int i = 1; i<inImg.rows - 1; ++i){
+        for(int j = 1; j<inImg.cols - 1; ++j){
             cover = true;
+            int x = 0;
+            int y = 0;
 
-            for(int k = i - halfLength, x = 0; k<=i+halfLength; k++, x++){
-                for(int l = j - halfLength, y = 0; l <= j+halfLength; l++, y++){
-                    color = outcopy.at<cv::Vec3b>(k, l);
+            for(int k = 0; k<3; k++){
+                for(int l = 0; l < 3; l++){
+                    x = i + k - 1;
+                    y = j + l - 1;
 
-                    if( !((color[0] == SE[x][y]) || SE[x][y] == -1) ){
+                    color = outcopy.at<cv::Vec3b>(x, y);
+
+                   if( !((color[0] == SE[k][l]) || SE[k][l] == -1) ){
                         cover = false;
                         break;
-                    }
+                   }
                 }
                 if(!cover)
                     break;
             }
-            if(cover) {
-                for (int m = i - halfLength; m <= i + halfLength; m++) {
-                    for (int n = j - halfLength; n <= j + halfLength; n++) {
-                        color[0] = 255;
-                        color[1] = 255;
-                        color[2] = 255;
-                        localOutImg.at<cv::Vec3b>(m, n) = color;
-                    }
-                }
-            } else {
-                for(int m = i - halfLength; m<=i+halfLength; m++){
-                    for(int n = j - halfLength; n <= j+halfLength; n++){
-                        color[0] = 0;
-                        color[1] = 0;
-                        color[2] = 0;
-                        localOutImg.at<cv::Vec3b>(m, n) = color;
-                    }
-                }
+
+            if(cover){
+                color[0] = 255;
+                color[1] = 255;
+                color[2] = 255;
+                localOutImg.at<cv::Vec3b>(i, j) = color;
+            } else{
+                color[0] = 0;
+                color[1] = 0;
+                color[2] = 0;
+                localOutImg.at<cv::Vec3b>(i, j) = color;
             }
+
 
         }
     }
@@ -183,7 +185,7 @@ cv::Mat hitmiss::hitOrMiss(const cv::Mat& inImg, const std::vector<std::vector<i
     return localOutImg;
 }
 
-cv::Mat hitmiss::convexHull(const cv::Mat& inImg) {
+cv::Mat hitmiss::thickening(const cv::Mat& inImg) {
     cv::Mat copy;
     inImg.copyTo(copy);
     cv::Mat localOutImg = cv::Mat::zeros(inImg.rows, inImg.cols, CV_8UC3);
@@ -191,16 +193,12 @@ cv::Mat hitmiss::convexHull(const cv::Mat& inImg) {
     while(!isEqual(copy, localOutImg)){
         copy.copyTo(localOutImg);
 
-        for(int i = 0; i<8; i++){
+        for(int i = 0; i<4; i++){
             copy = customOr(copy, hitOrMiss(copy, SE1));
             copy = customOr(copy, hitOrMiss(copy, SE2));
-            std::cout<<"- - -\n";
-            showSE(SE1);
             rotate(SE1);
             rotate(SE2);
         }
-
-        std::cout<<"FLAGA"<<std::endl;
     }
 
     return copy;
