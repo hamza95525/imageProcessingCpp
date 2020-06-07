@@ -29,10 +29,10 @@ private:
     static cv::Mat erosionBin(const cv::Mat& inImg, const strel& SE);
     static cv::Mat dilateBin(const cv::Mat& inImg, const strel& SE);
 
-    static cv::Mat erosionMono(cv::Mat inImg, const strel& SE);
-    static cv::Mat dilateMono(cv::Mat inImg, const strel& SE);
+    static cv::Mat erosionMono(const cv::Mat& inImg, const strel& SE);
+    static cv::Mat dilateMono(const cv::Mat& inImg, const strel& SE);
 
-    static cv::Mat binarization(cv::Mat inImg);
+    static cv::Mat binarization(const cv::Mat& inImg);
     static std::vector<int> minCoords(std::vector<std::vector<double>> &grayArr);
     static std::vector<int> maxCoords(std::vector<std::vector<double>> &grayArr);
 };
