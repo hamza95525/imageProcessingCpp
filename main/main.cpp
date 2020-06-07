@@ -8,10 +8,13 @@
 cv::Mat menu(char nNumber, const cv::Mat& img);
 
 int main() {
-    std::string name1;
+    std::string name1, name2;
     std::cout << "Prosze wprowadzic sciezke do pliku: ";
     std::cin >> name1;
-    cv::Mat img = cv::imread(name1, CV_32F);
+    std::cout << "Prosze wprowadzic sciezke do zapisu: ";
+    std::cin >> name2;
+
+    cv::Mat img = cv::imread(name1);
 
     if(!img.data) {
         std::cout << "Nie odnaleziono pliku!" << name1 << std::endl;
@@ -24,11 +27,14 @@ int main() {
 
     cv::Mat out = menu(n, img);
 
+    cv::imwrite(name2, out);
+
     cv::namedWindow("in", cv::WINDOW_AUTOSIZE);
     cv::imshow("in", img);
 
     cv::namedWindow("out", cv::WINDOW_AUTOSIZE);
     cv::imshow("out", out);
+
 
     cv::waitKey(0);
     return 0;

@@ -109,7 +109,6 @@ void histogram::createLUT() {
             if( n >= nKlass )
                 n = nKlass - 1;
         }
-        std::cout << "Lut = " << ((double)((N-1)*n)/(double)(nKlass-1)) << std::endl;
         LUT.push_back( ((double)((N-1)*n)/(double)(nKlass-1)) );
     }
 
